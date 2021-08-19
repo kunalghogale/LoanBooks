@@ -32,6 +32,9 @@ public class LoansProcessor {
         final List<Assignment> assignments = new ArrayList<>();
         final List<Yield> yields = new ArrayList<>();
         final Map<Integer, Yield> facilityYieldMap = new HashMap<>();
+        /** For data verification
+         final Map<Integer, List<Loan>> facilityLoanMap = new HashMap<>();
+         * */
 
         for (final Loan loan : loans) {
             System.out.println("Processing loan " + loan.getId() + " for amount " + loan.getAmount());
@@ -46,7 +49,7 @@ public class LoansProcessor {
                     System.out.println("Checking facility " + facilityCovenant.getFacility().getId());
                     if (facilityCovenant.getFacility().getAmount() < loan.getAmount()) {
                         System.out.println("Facility cannot support amount " + facilityCovenant.getFacility().getAmount());
-                        break;
+                        continue;
                     }
                     final List<Covenant> cvs = facilityCovenant.getCovenants();
                     System.out.println("Facility has " + cvs.size() + " covenants");
@@ -87,16 +90,37 @@ public class LoansProcessor {
                     yields.add(yield);
                     facilityYieldMap.put(bestFacility.getId(), yield);
                 }
-                System.out.println("Completed underwriting loan " + loan.getId() + " to facility " + bestFacility.getId() + " for yield " + maxYield);
+                System.out.println("Completed underwriting loan " + loan.getId() + " to facility " + bestFacility.getId() + " for amount " + loan.getAmount());
+                System.out.println("Facility " + bestFacility.getId() + " amount before loan " + bestFacility.getAmount());
                 bestFacility.setAmount(bestFacility.getAmount() - loan.getAmount());
                 System.out.println("Facility " + bestFacility.getId() + " amount reduced to " + bestFacility.getAmount());
                 System.out.println("****************************************************************************************");
+                /** For data verification
+                if (!facilityLoanMap.containsKey(bestFacility.getId())) {
+                    facilityLoanMap.put(bestFacility.getId(), new ArrayList<>());
+                }
+                facilityLoanMap.getOrDefault(bestFacility.getId(), new ArrayList<>()).add(loan);
+                 */
             } else {
                 System.out.println("Could not fund loan...");
                 System.out.println("****************************************************************************************");
             }
         }
 
+        /**
+         * For data verification
+        for (final Map.Entry<Integer, List<Loan>> facilityListEntry : facilityLoanMap.entrySet()) {
+            final List<String> loanIds = facilityListEntry.getValue().stream().map(loan -> String.valueOf(loan.getId())).collect(Collectors.toList());
+            System.out.println(facilityListEntry.getKey() + ":" + String.join(",", loanIds));
+        }
+        System.out.println("****************************************************************************************");
+
+        for (final Facility facility : facilities) {
+            System.out.println("Id: " + facility.getId() + " Amount Remaining: " + facility.getAmount());
+        }
+        System.out.println("****************************************************************************************");
+
+        **/
         return AssignmentYield.builder()
                 .assignments(assignments)
                 .yields(yields)
