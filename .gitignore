@@ -1,0 +1,5 @@
+.DS_Store
+large/.DS_Store
+small/.DS_Store
+target/*
+.idea/*
